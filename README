@@ -1,1 +1,13 @@
 XNAT library for R
+
+requires RCurl and XML
+
+tcltk is needed for password prompting
+
+example:
+
+    > source('xnat.R')
+    > conn <- xnat.connection('https://central.xnat.org')
+    > conn$projects()
+    > conn$subjects('CENTRAL_OASIS_CS')
+    > conn$close()
