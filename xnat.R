@@ -285,6 +285,23 @@ xnat.connection <- function(base_url, username=NULL, password=NULL)
         return(.experiments)
     }
 
+    run.stored.search <- function(search_id) {
+        if(is.null(.saved.searches)) {
+            data <- .xnat.call('/data/search/saved?format=csv')
+            csv <- .csv.from.string(data)
+            .saved.searches <<- csv$id
+        }
+        if(!search_id %in% .saved.searches) {
+            stop(sprintf('unknown stored search "%s"', search_id))
+        }
+        data <- .xnat.call(paste('/data/search/saved/', 
+                                 search_id, 
+                                 '/results?format=csv', 
+                                 sep = ''))
+        csv <- .csv.from.string(data)
+        return(csv)
+    }
+
     is.connected <- function() {
         if(is.null(jsid))
             return(FALSE)
@@ -345,13 +362,15 @@ xnat.connection <- function(base_url, username=NULL, password=NULL)
     .subjects <- NULL
     .experiment.types <- NULL
     .experiments <- NULL
+    .saved.searches <- NULL
 
     rv = list(base_url = base_url, 
               close = close, 
               is.connected = is.connected, 
               projects = projects, 
               subjects = subjects, 
-              experiments = experiments)
+              experiments = experiments, 
+              run.stored.search = run.stored.search)
 
     class(rv) <- 'XNATConnection'
 
